@@ -1,2 +1,8 @@
 # Virtual Environment
 .venv
+
+/data/Final_Prosumption_dataset_all.csv
+data/Final_Energy_dataset.csv
+
+/src/notebooks/models
+/src/notebooks/wandb

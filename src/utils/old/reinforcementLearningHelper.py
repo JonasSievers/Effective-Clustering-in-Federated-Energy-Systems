@@ -81,55 +81,49 @@ def get_energy_dataset():
 
     return final_df
   
-def initialize_ddpg_agent(observation_spec, action_spec, global_step, environments): 
+def initialize_ddpg_agent(observation_spec, action_spec, global_step, environments, first_building=1): 
     
-    layers = (400,300)
     actor_net = ddpg.actor_network.ActorNetwork(
         input_tensor_spec=observation_spec,
         output_tensor_spec=action_spec, 
-        fc_layer_params=layers,
-        #dropout_layer_params=(0.2),
-        #conv_layer_params=((32, 3, 1), (64, 3, 1)),
+        fc_layer_params=(400, 300),
         activation_fn=tf.keras.activations.relu)
      
-    """critic_net = ddpg.critic_network.CriticNetwork(
-        input_tensor_spec=(observation_spec, action_spec),
-        observation_fc_layer_params=(128,),
-        joint_fc_layer_params=(128,),
-        activation_fn=tf.keras.activations.relu)"""
-    
     critic_net = ddpg.critic_network.CriticNetwork(
         input_tensor_spec=(observation_spec, action_spec),
-        joint_fc_layer_params=layers,
+        observation_fc_layer_params=(400,),
+        joint_fc_layer_params=(300,),
         activation_fn=tf.keras.activations.relu)
-
+    
     target_actor_network = ddpg.actor_network.ActorNetwork(
         input_tensor_spec=observation_spec,
-        output_tensor_spec=action_spec, fc_layer_params=layers,
+        output_tensor_spec=action_spec, 
+        fc_layer_params=(400, 300),
         activation_fn=tf.keras.activations.relu)
 
     target_critic_network = ddpg.critic_network.CriticNetwork(
         input_tensor_spec=(observation_spec, action_spec),
-        joint_fc_layer_params=layers,
+        observation_fc_layer_params=(400,),
+        joint_fc_layer_params=(300,),
         activation_fn=tf.keras.activations.relu)
     
 
     agent_params = {
-        "time_step_spec": environments["train"][f"building_{1}"].time_step_spec(),
-        "action_spec": environments["train"][f"building_{1}"].action_spec(),
+        "time_step_spec": environments["train"][f"building_{first_building}"].time_step_spec(),
+        "action_spec": environments["train"][f"building_{first_building}"].action_spec(),
         "actor_network": actor_net,
         "critic_network": critic_net,
-        "actor_optimizer": tf.compat.v1.train.AdamOptimizer(learning_rate=1e-4), #1e-3
-        "critic_optimizer": tf.compat.v1.train.AdamOptimizer(learning_rate=1e-3), #1e-2
-        "ou_stddev": 0.2, #0.9,
+        "actor_optimizer": tf.compat.v1.train.AdamOptimizer(learning_rate=1e-4), 
+        "critic_optimizer": tf.compat.v1.train.AdamOptimizer(learning_rate=1e-3), 
+        "ou_stddev": 0.2,
         "ou_damping": 0.15,
         "target_actor_network": target_actor_network,
         "target_critic_network": target_critic_network,
         "target_update_tau": 0.05,
-        "target_update_period": 5, #100,
+        "target_update_period": 5,
         "dqda_clipping": None,
         "td_errors_loss_fn": tf.compat.v1.losses.huber_loss,
-        "gamma": 0.99, #1
+        "gamma": 0.99, 
         "reward_scale_factor": 1,
         "train_step_counter": global_step,
     }

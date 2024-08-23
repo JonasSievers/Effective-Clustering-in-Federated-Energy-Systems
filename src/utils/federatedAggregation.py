@@ -74,7 +74,7 @@ class FederatedAggregation():
 
         return aggregated_weights
     
-    def federated_weigthed_aggregation(weights_list, performance_metrics, aggregation_method='mean', clipping=None, noise_stddev=0.0):
+    def federated_weighted_aggregation(weights_list, performance_metrics, aggregation_method='mean', clipping=None, noise_stddev=0.0):
         
         """
         Aggregates weights from multiple models based on their performance metrics.
